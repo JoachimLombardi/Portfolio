@@ -24,3 +24,11 @@
 ### :man_technologist: About Me :
 
 I am a learning Data Scientist <img src="https://media.giphy.com/media/5tdug88O18Rvm2m0tt/giphy.gif" width="30"> from France.
+
+- 🔰: I’ve started my way to computing science by learning web languages (HTML, CSS, PHP), then I discovered software languages (C, C++, C#) and now I have been studying my favorite Data Science languages (Python,                 Matplotlib, Tensorflow).
+
+- :seedling: I have learned working with structured (data table) and unstructured data (images) in regression (price) and classification (binary and multiclass) types. Transfer learning (sequential and functional with                    features extraction and fine tuning).
+
+- 🌔: I foresee to achieve a project in machine learning to classify birds among 510 breeds, to finish my TensorFlow developper formation and to undertake a nineteen month apprenticeship training.
+
+- :mailbox:How to reach me: [send me an email](lombardi.joachim@gmail.com)
