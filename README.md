@@ -32,3 +32,7 @@ I am a learning Data Scientist <img src="https://media.giphy.com/media/5tdug88O1
 - 🌔: I foresee to achieve a project in machine learning to classify birds among 510 breeds, to finish my TensorFlow developper formation and to undertake a nineteen month apprenticeship training.
 
 - :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/joachim-lombardi-121a441b/)
+
+---
+
+### :hammer_and_wrench: Languages and Tools :
