@@ -13,5 +13,8 @@
 
 <h1>
   My deep learning courses and projects with TensorFlow
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmVlOTI0MTA0OTUzNjZkYjE0OGMyZTM4NTJiZDdjNGE0ZDQ0YmRmNSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/8SRqnPebX1H8lQy5YR/giphy.gif" width="180px"/>
 </h1>
+
+ <div>
+ <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmVlOTI0MTA0OTUzNjZkYjE0OGMyZTM4NTJiZDdjNGE0ZDQ0YmRmNSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/8SRqnPebX1H8lQy5YR/giphy.gif" width="180px"/>
+  </div>
