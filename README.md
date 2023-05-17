@@ -14,6 +14,5 @@ All my courses and projects about tensorflow.
 
 <h1>
   Welcome
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmVlOTI0MTA0OTUzNjZkYjE0OGMyZTM4NTJiZDdjNGE0ZDQ0YmRmNSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/8SRqnPebX1H8lQy5YR/giphy.gif" width="30px"/>
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmVlOTI0MTA0OTUzNjZkYjE0OGMyZTM4NTJiZDdjNGE0ZDQ0YmRmNSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/8SRqnPebX1H8lQy5YR/giphy.gif" width="300px"/>
 </h1>
-https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzk1aGE4M3RnN2dsMHB4eHRkY2RhOG56ZzNpdnFxamt5emJhcmVwMiZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/SU2ic3wTfuC6JhD1lA/giphy.gif
