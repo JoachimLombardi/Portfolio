@@ -5,8 +5,6 @@ All my courses and projects about tensorflow.
   <img src="https://media.giphy.com/media/QpVUMRUJGokfqXyfa1/giphy.gif" width="150" height="100"/>
 </div>
 
-
-
 <div id="badges" align="center">
   <img src="https://komarev.com/ghpvc/?username=JoachimLombardi&style=flat-square&color=brightgreen" alt=""/>
   <a href="https://www.linkedin.com/in/joachim-lombardi-121a441b/">
@@ -14,3 +12,7 @@ All my courses and projects about tensorflow.
   </a>
 </div>
 
+<h1>
+  Welcome
+  <img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" width="30px"/>
+</h1>
