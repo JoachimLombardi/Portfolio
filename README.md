@@ -8,11 +8,9 @@ All my courses and projects about tensorflow.
 
 
 <div id="badges" align="center">
+  <img src="https://komarev.com/ghpvc/?username=JoachimLombardi&style=flat-square&color=blue" alt=""/>
   <a href="https://www.linkedin.com/in/joachim-lombardi-121a441b/">
     <img src="https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white&style=flat-square" alt="LinkedIn Badge"/>
   </a>
 </div>
 
-<div id="badges" align="center">
-<img src="https://komarev.com/ghpvc/?username=JoachimLombardi&style=flat-square&color=blue" alt=""/>
-</div>
