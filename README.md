@@ -11,7 +11,7 @@
 
 
 <h1>
-  My deep learning courses and projects with TensorFlow
+  My data analyst projects and my deep learning courses and projects with TensorFlow
    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzk1aGE4M3RnN2dsMHB4eHRkY2RhOG56ZzNpdnFxamt5emJhcmVwMiZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/SU2ic3wTfuC6JhD1lA/giphy.gif" width="100px"/>
 </h1>
 
