@@ -23,4 +23,4 @@
 
 ### :man_technologist: About Me :
 
-I am a learning Data Scientist <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> from France.
+I am a learning Data Scientist <img src="https://media.giphy.com/media/5tdug88O18Rvm2m0tt/giphy.gif" width="30"> from France.
