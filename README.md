@@ -14,5 +14,5 @@ All my courses and projects about tensorflow.
 
 <h1>
   Welcome
-  <img src="https://media.giphy.com/media/B6wdZEDP2TXRkA83o5/giphy.gif" width="30px"/>
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzk1aGE4M3RnN2dsMHB4eHRkY2RhOG56ZzNpdnFxamt5emJhcmVwMiZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/SU2ic3wTfuC6JhD1lA/giphy.gif" width="30px"/>
 </h1>
