@@ -4,7 +4,7 @@
 
 <div id="badges" align="center">
   <img src="https://komarev.com/ghpvc/?username=JoachimLombardi&style=flat-square&color=brightgreen" alt=""/>
-  <a href="https://www.linkedin.com/in/joachim-lombardi-121a441b/">
+  <a href="https://www.linkedin.com/in/joachim-lombardi-machinelearning-intelligenceartificielle-datascientist/">
     <img src="https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white&style=flat-square" alt="LinkedIn Badge"/>
   </a>
 </div>
@@ -31,7 +31,7 @@ I am a learning Data Scientist <img src="https://media.giphy.com/media/5tdug88O1
 
 - 🌔: I foresee to achieve a project in machine learning to classify birds among 510 breeds, to finish my TensorFlow developper formation and to undertake a nineteen month apprenticeship training.
 
-- :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/joachim-lombardi-121a441b/)
+- :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/joachim-lombardi-machinelearning-intelligenceartificielle-datascientist/)
 
 ---
 
