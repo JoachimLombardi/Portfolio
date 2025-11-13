@@ -10,6 +10,26 @@ def train_test_step(model: torch.nn.Module,
                     optimizer: torch.optim.Optimizer, 
                     device: torch.device,
                     epochs: int = 5) -> Dict[str, List[float]]:
+    """
+    Trains and tests a PyTorch model
+
+    Turns a target PyTorch model to training mode and then
+    runs the forward and backward passes on a training dataset.
+    It also calculates and returns the loss and accuracy on the test dataset
+
+    Args:
+      model: A PyTorch model to be trained and tested
+      train_dataloader: A DataLoader instance for the model to be trained on
+      test_dataloader: A DataLoader instance for the model to be tested on
+      loss_fn: A PyTorch loss function to minimize
+      optimizer: A PyTorch optimizer to help minimize the loss function
+      device: A target device to compute on (e.g. "cuda" or "cpu")
+
+    Returns:
+      A dictionary of training and testing loss as well as training and
+      testing accuracy metrics. Each metric has a value in a list for 
+      each epoch.
+    """
     results = {
         "train_loss": [],
         "train_acc": [],
