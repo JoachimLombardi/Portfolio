@@ -34,3 +34,42 @@ def save_model(model: torch.nn.Module,
     print(f"[INFO] Saving model to: {model_save_path}")
     torch.save(obj=model.state_dict(),
              f=model_save_path)
+
+
+def load_model(model_path: str,
+               model_builder: torch.nn.Module,
+               device: torch.device,
+               input_shape: int,
+               output_shape: int,
+               hidden_units: int,
+               num_blocks: int):
+
+    '''
+    Loads a PyTorch model from a target directory.
+
+    Args:
+    model_path: A directory for saving the model to.
+    model_builder: A model builder to use to create the model.
+    device: A target device to compute on (e.g. "cuda" or "cpu").
+    input_shape: Number of channels in the input
+    output_shape: Number of channels in the output
+    hidden_units: Number of hidden units
+    num_blocks: Number of convolutional layers
+
+    Returns:
+    A PyTorch model from a target directory
+    '''
+    loaded_model = model_builder(input_shape=input_shape,
+                                 hidden_units=hidden_units,
+                                 output_shape=output_shape,
+                                 num_blocks=num_blocks
+                                ).to(device)
+    loaded_model.load_state_dict(torch.load(model_path))
+    return loaded_model
+
+
+def get_classes(image_dir):
+
+  train_path = Path(image_dir)
+  class_names = [d.name for d in train_path.iterdir() if d.is_dir()]
+  return class_names
