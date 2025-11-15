@@ -18,6 +18,8 @@ if __name__ == "__main__":
   BATCH_SIZE = 32
   HIDDEN_UNITS = 10
   LEARNING_RATE = 0.001
+  NUM_WORKERS = os.cpu_count()
+
 
   # Setup target device
   device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -44,7 +46,8 @@ if __name__ == "__main__":
       train_dir=train_dir,
       test_dir=test_dir,
       transform=data_transform,
-      batch_size=BATCH_SIZE
+      batch_size=BATCH_SIZE,
+      num_workers=NUM_WORKERS
   )
 
   # Create model with help from model_builder.py
