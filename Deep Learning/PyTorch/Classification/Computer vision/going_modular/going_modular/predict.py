@@ -15,15 +15,14 @@ def predict_image(img_path, model, class_names, device, image_transform):
     '''
 
     img = Image.open(img_path)
-    img = image_transform(img).to(device)
-    fig = plt.figure(figsize=(5, 5))
+    img_transformed = image_transform(img).to(device)
     model.eval()
     with torch.inference_mode():
-        pred_logit = model(img.unsqueeze(0).to(device))
+        pred_logit = model(img_transformed.unsqueeze(0).to(device))
         pred_probs = torch.softmax(pred_logit, dim=1)[0]
         pred_classes = pred_logit.argmax(1)
-        plt.imshow(img.permute(1, 2, 0).cpu())
-        plt.title(f"Prediction: {class_names[pred_classes]} | Probability: {pred_probs[pred_classes].item()*100:.2f} %")
-        print(f"Prediction: {class_names[pred_classes]} | Probability: {pred_probs[pred_classes].item()*100:.2f} %")
-        plt.axis("off")
-
+    fig = plt.figure(figsize=(5, 5))
+    plt.imshow(img)
+    plt.title(f"Prediction: {class_names[pred_classes]} | Probability: {pred_probs[pred_classes].item()*100:.2f} %")
+    print(f"Prediction: {class_names[pred_classes]} | Probability: {pred_probs[pred_classes].item()*100:.2f} %")
+    plt.axis("off")    
