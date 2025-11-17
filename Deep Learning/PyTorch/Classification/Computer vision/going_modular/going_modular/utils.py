@@ -41,10 +41,7 @@ def save_model(model: torch.nn.Module,
 def load_model(model_path: str,
                model_builder: torch.nn.Module,
                device: torch.device,
-               input_shape: int,
-               output_shape: int,
-               hidden_units: int,
-               num_blocks: int):
+               params: dict = None):
 
     '''
     Loads a PyTorch model from a target directory.
@@ -61,12 +58,8 @@ def load_model(model_path: str,
     Returns:
     A PyTorch model from a target directory
     '''
-    loaded_model = model_builder(input_shape=input_shape,
-                                 hidden_units=hidden_units,
-                                 output_shape=output_shape,
-                                 num_blocks=num_blocks
-                                ).to(device)
-    loaded_model.load_state_dict(torch.load(model_path))
+    loaded_model = model_builder if params is None else model_builder(**params)
+    loaded_model.load_state_dict(torch.load(model_path, map_location=device))
     return loaded_model
 
 

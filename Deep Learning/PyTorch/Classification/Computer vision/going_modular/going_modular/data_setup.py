@@ -7,7 +7,7 @@ def create_dataloaders(
         test_dir: str,
         transform: transforms.Compose,
         batch_size: int,
-        num_workers: int
+        num_workers: int = os.cpu_count()
 ):
     '''
     Creates train and test dataloaders

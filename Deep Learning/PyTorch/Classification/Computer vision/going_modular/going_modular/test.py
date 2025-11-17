@@ -21,13 +21,15 @@ image_transform = transforms.Compose([
 ])
 
 # Load model
+params = {"input_shape": INPUT_SHAPE,
+          "output_shape": len(class_names),
+          "hidden_units": HIDDEN_UNITS,
+          "num_blocks": NUM_BLOCKS}
+
 model = load_model(model_path="models/05_going_modular_script_mode_tinyvgg_model.pth",
                    model_builder=TinyVGG,
                    device=device,
-                   input_shape=INPUT_SHAPE,
-                   output_shape=len(class_names),
-                   hidden_units=HIDDEN_UNITS,
-                   num_blocks=NUM_BLOCKS)
+                   params=params)
 
 # Predict
 predict_image(img_path="images/istockphoto-540233806-612x612.jpg",
