@@ -36,3 +36,4 @@ def get_data(url, file):
 
         # Remove zip file
         os.remove(f"{image_path}.zip")
+        return image_path
