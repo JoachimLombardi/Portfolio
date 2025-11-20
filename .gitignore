@@ -1,20 +1,20 @@
 # --- DATASETS ---
 # Food-101 dataset (ignore everything inside data/)
-*/data/
-*/data/*
+**/data/
+**/data/**
 
 # --- CACHE & COMPILATION ---
 __pycache__/
 *.pyc
 
 # --- MODEL CHECKPOINTS ---
-*/models/
-*/models/*
+**/models/
+**/models/**
 
 # --- TRAINING RUNS ---
-*/runs/
-*/runs/*
+**/runs/
+**/runs/**
 
 # --- GENERATED IMAGES / PLOTS ---
-*/images/
-*/images/*
+**/images/
+**/images/**
