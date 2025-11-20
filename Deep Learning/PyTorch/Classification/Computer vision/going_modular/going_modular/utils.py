@@ -4,8 +4,13 @@ Contains various utility functions for PyTorch model training and saving.
 from pathlib import Path
 from typing import List, Dict
 import matplotlib.pyplot as plt
-
+from torch.utils.tensorboard import SummaryWriter
+from datetime import datetime
+import os
 import torch
+from torch import nn
+import numpy as np
+
 
 def save_model(model: torch.nn.Module,
                target_dir: str,
@@ -58,9 +63,10 @@ def load_model(model_path: str,
     Returns:
     A PyTorch model from a target directory
     '''
-    loaded_model = model_builder if params is None else model_builder(**params)
-    loaded_model.load_state_dict(torch.load(model_path, map_location=device))
-    return loaded_model
+    if params:
+      model_builder = model_builder(**params)
+    model_builder.load_state_dict(torch.load(model_path, map_location=device))
+    return model_builder
 
 
 def get_classes(image_dir):
@@ -109,4 +115,78 @@ def plot_loss_curves(results: Dict[str, List[float]]):
     plt.plot(epochs, test_accuracy, label='test_accuracy')
     plt.title('Accuracy')
     plt.xlabel('Epochs')
-    plt.legend();
+    plt.legend()
+
+
+def create_writer(experiment_name: str, 
+                  model_name: str, 
+                  extra: str) -> SummaryWriter:
+    """Creates a torch.utils.tensorboard.writer.SummaryWriter() instance saving to a specific log_dir.
+    log_dir is a combination of runs/timestamp/experiment_name/model_name/extra.
+    Where timestamp is the current date in YYYY-MM-DD format.
+
+    Args:
+        experiment_name (str): Name of experiment.
+        model_name (str): Name of model.
+        extra (str, optional): Anything extra to add to the directory. Defaults to None.
+
+    Returns:
+        torch.utils.tensorboard.writer.SummaryWriter(): Instance of a writer saving to log_dir.
+
+    Example usage:
+        # Create a writer saving to "runs/2022-06-04/data_10_percent/effnetb2/5_epochs/"
+        writer = create_writer(experiment_name="data_10_percent",
+                               model_name="effnetb2",
+                               extra="5_epochs")
+        # The above is the same as:
+        writer = SummaryWriter(log_dir="runs/2022-06-04/data_10_percent/effnetb2/5_epochs/")
+    """
+
+    # Get timestamp of current date (all experiments on certain day live in same folder)
+    timestamp = datetime.now().strftime("%Y-%m-%d") # returns current date in YYYY-MM-DD format
+    log_dir = os.path.join("runs", timestamp, experiment_name, model_name)  # Create log directory path
+    if extra:
+        log_dir = os.path.join("runs", timestamp, experiment_name, model_name, extra)
+    print(f"[INFO] Created SummaryWriter, saving to: {log_dir}...")
+    return SummaryWriter(log_dir=log_dir)
+
+
+def img_denorm(tensor_image) -> np.ndarray:
+    '''
+    Denormalizes an image tensor.
+
+    Args:
+        tensor_image: An image tensor.
+
+    Returns:
+        A denormalized image tensor.
+    '''
+    mean = torch.tensor([0.485, 0.456, 0.406]).view(3,1,1)
+    std = torch.tensor([0.229, 0.224, 0.225]).view(3,1,1)
+    tensor_image = tensor_image * std + mean
+    tensor_image = tensor_image.permute(1,2,0)
+    tensor_image = np.clip(tensor_image,0,1)
+    return tensor_image
+
+
+def freeze_pretrained_model(model, class_names, device):
+    '''
+    Freezes the pretrained model's parameters.
+
+    Args:
+        model: A pretrained PyTorch model.
+        class_names: A list of class names for the model.
+        device: A target device to compute on (e.g. "cuda" or "cpu").
+    '''
+    for params in model.parameters():
+        params.requires_grad = False
+
+    for module in reversed(list(model.modules())):
+        if isinstance(module, nn.Linear):
+            in_features = module.in_features 
+            break
+
+    model.classifier = nn.Sequential(
+        nn.Dropout(p=0.2, inplace=True),
+        nn.Linear(in_features=in_features, out_features=len(class_names))
+    ).to(device)

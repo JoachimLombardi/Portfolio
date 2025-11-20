@@ -2,6 +2,7 @@ from typing import Dict, List
 from timeit import default_timer as timer
 import torch
 from tqdm.auto import tqdm
+from going_modular.going_modular.utils import create_writer
 
 def train_test_step(model: torch.nn.Module, 
                     train_dataloader: torch.utils.data.DataLoader, 
@@ -9,13 +10,17 @@ def train_test_step(model: torch.nn.Module,
                     loss_fn: torch.nn.Module, 
                     optimizer: torch.optim.Optimizer, 
                     device: torch.device,
-                    epochs: int = 5) -> Dict[str, List[float]]:
+                    experiment_name: str = "experiment",
+                    model_name: str = "model",
+                    extra: str = None,
+                    epochs: int = 5,
+                    ) -> Dict[str, List[float]]:
     """
     Trains and tests a PyTorch model
 
-    Turns a target PyTorch model to training mode and then
-    runs the forward and backward passes on a training dataset.
-    It also calculates and returns the loss and accuracy on the test dataset
+    Turns a PyTorch model to training mode and then trains it on our training dataset.
+    Then tests the model on the test dataset and returns the model's accuracy and loss.
+    Use tensorboard to produce graphs of the training and testing loss and accuracy.
 
     Args:
       model: A PyTorch model to be trained and tested
@@ -37,6 +42,7 @@ def train_test_step(model: torch.nn.Module,
         "test_acc": []
     }
     torch.manual_seed(42)
+    writer = create_writer(experiment_name, model_name, extra)
     train_start = timer()
     for epoch in tqdm(range(epochs)):
         print(f"Epoch {epoch}\n-------")
@@ -73,6 +79,22 @@ def train_test_step(model: torch.nn.Module,
         results["test_acc"].append(test_acc)
         print(f"Train loss: {train_loss:.3f} | Train accuracy: {train_acc:.2f}%")
         print(f"Test loss: {test_loss:.3f} | Test accuracy: {test_acc:.2f}%")
+        # Add loss results to SummaryWriter
+        writer.add_scalars(main_tag="Loss", 
+                           tag_scalar_dict={"train_loss": train_loss,
+                                            "test_loss": test_loss},
+                           global_step=epoch)
+        # Add accuracy results to SummaryWriter
+        writer.add_scalars(main_tag="Accuracy", 
+                           tag_scalar_dict={"train_acc": train_acc,
+                                            "test_acc": test_acc}, 
+                           global_step=epoch)
+        # Track the PyTorch model architecture
+        writer.add_graph(model=model, 
+                         # Pass in an example input
+                         input_to_model=torch.randn(32, 3, 224, 224).to(device))
+    # Close the writer
+    writer.close()
     train_end = timer()
     total_time = train_end - train_start
     print(f"Train time on {device}: {total_time:.3f} seconds")
