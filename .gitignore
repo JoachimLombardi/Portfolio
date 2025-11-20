@@ -1,9 +1,10 @@
 # Ignore Food101 dataset images
-Deep Learning/PyTorch/Classification/Computer vision/data/food_101/food-101/train/
-Deep Learning/PyTorch/Classification/Computer vision/data/food_101/food-101/test/
+Deep Learning/PyTorch/Classification/Computer vision/data/
 
 __pycache__/
 *.pyc
 
 
-Deep Learning/PyTorch/Classification/Computer vision/models
+Deep Learning/PyTorch/Classification/Computer vision/models/
+Deep Learning/PyTorch/Classification/Computer vision/runs/
+Deep Learning/PyTorch/Classification/Computer vision/images/
