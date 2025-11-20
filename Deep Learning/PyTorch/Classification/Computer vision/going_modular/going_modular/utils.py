@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 import os
+from torch.utils.tensorboard import SummaryWriter
+from datetime import datetime
+import os
 import torch
 from torch import nn
 import numpy as np
@@ -63,6 +66,10 @@ def load_model(model_path: str,
     Returns:
     A PyTorch model from a target directory
     '''
+    if params:
+      model_builder = model_builder(**params)
+    model_builder.load_state_dict(torch.load(model_path, map_location=device))
+    return model_builder
     if params:
       model_builder = model_builder(**params)
     model_builder.load_state_dict(torch.load(model_path, map_location=device))
