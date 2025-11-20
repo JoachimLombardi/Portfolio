@@ -1,0 +1,101 @@
+from typing import Dict, List
+from timeit import default_timer as timer
+import torch
+from tqdm.auto import tqdm
+from going_modular.going_modular.utils import create_writer
+
+def train_test_step(model: torch.nn.Module, 
+                    train_dataloader: torch.utils.data.DataLoader, 
+                    test_dataloader: torch.utils.data.DataLoader, 
+                    loss_fn: torch.nn.Module, 
+                    optimizer: torch.optim.Optimizer, 
+                    device: torch.device,
+                    experiment_name: str = "experiment",
+                    model_name: str = "model",
+                    extra: str = None,
+                    epochs: int = 5,
+                    ) -> Dict[str, List[float]]:
+    """
+    Trains and tests a PyTorch model
+
+    Turns a PyTorch model to training mode and then trains it on our training dataset.
+    Then tests the model on the test dataset and returns the model's accuracy and loss.
+    Use tensorboard to produce graphs of the training and testing loss and accuracy.
+
+    Args:
+      model: A PyTorch model to be trained and tested
+      train_dataloader: A DataLoader instance for the model to be trained on
+      test_dataloader: A DataLoader instance for the model to be tested on
+      loss_fn: A PyTorch loss function to minimize
+      optimizer: A PyTorch optimizer to help minimize the loss function
+      device: A target device to compute on (e.g. "cuda" or "cpu")
+
+    Returns:
+      A dictionary of training and testing loss as well as training and
+      testing accuracy metrics. Each metric has a value in a list for 
+      each epoch.
+    """
+    results = {
+        "train_loss": [],
+        "train_acc": [],
+        "test_loss": [],
+        "test_acc": []
+    }
+    torch.manual_seed(42)
+    writer = create_writer(experiment_name, model_name, extra)
+    train_start = timer()
+    for epoch in tqdm(range(epochs)):
+        print(f"Epoch {epoch}\n-------")
+        train_loss = 0
+        train_acc = 0
+        for batch, (X,y) in enumerate(train_dataloader):
+            X, y = X.to(device), y.to(device)
+            model.train().to(device)
+            y_pred = model(X)
+            loss = loss_fn(y_pred, y)
+            train_loss += loss
+            train_acc += ((torch.eq(torch.argmax(dim=1, input=y_pred), y)).sum().item()/len(y_pred))*100
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if batch % 400 == 0:
+                print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples")
+        train_loss /= len(train_dataloader)
+        train_acc /= len(train_dataloader)
+        test_loss = 0
+        test_acc = 0
+        model.eval().to(device)
+        with torch.inference_mode():
+            for X, y in test_dataloader:
+                X, y = X.to(device), y.to(device)
+                test_pred = model(X)
+                test_loss += loss_fn(test_pred, y)
+                test_acc += ((torch.eq(torch.argmax(dim=1, input=test_pred), y)).sum().item()/len(test_pred))*100
+            test_loss /= len(test_dataloader)
+            test_acc /= len(test_dataloader)
+        results["train_loss"].append(train_loss.item())
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss.item())
+        results["test_acc"].append(test_acc)
+        print(f"Train loss: {train_loss:.3f} | Train accuracy: {train_acc:.2f}%")
+        print(f"Test loss: {test_loss:.3f} | Test accuracy: {test_acc:.2f}%")
+        # Add loss results to SummaryWriter
+        writer.add_scalars(main_tag="Loss", 
+                           tag_scalar_dict={"train_loss": train_loss,
+                                            "test_loss": test_loss},
+                           global_step=epoch)
+        # Add accuracy results to SummaryWriter
+        writer.add_scalars(main_tag="Accuracy", 
+                           tag_scalar_dict={"train_acc": train_acc,
+                                            "test_acc": test_acc}, 
+                           global_step=epoch)
+        # Track the PyTorch model architecture
+        writer.add_graph(model=model, 
+                         # Pass in an example input
+                         input_to_model=torch.randn(32, 3, 224, 224).to(device))
+    # Close the writer
+    writer.close()
+    train_end = timer()
+    total_time = train_end - train_start
+    print(f"Train time on {device}: {total_time:.3f} seconds")
+    return results
