@@ -7,12 +7,10 @@ import matplotlib.pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 import os
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-import os
 import torch
 from torch import nn
 import numpy as np
+import random
 
 
 def save_model(model: torch.nn.Module,
@@ -58,18 +56,15 @@ def load_model(model_path: str,
     model_path: A directory for saving the model to.
     model_builder: A model builder to use to create the model.
     device: A target device to compute on (e.g. "cuda" or "cpu").
-    input_shape: Number of channels in the input
-    output_shape: Number of channels in the output
-    hidden_units: Number of hidden units
-    num_blocks: Number of convolutional layers
+    params: A dictionary of parameters to include when creating the model
+        input_shape: Number of channels in the input
+        output_shape: Number of channels in the output
+        hidden_units: Number of hidden units
+        num_blocks: Number of convolutional layers
 
     Returns:
     A PyTorch model from a target directory
     '''
-    if params:
-      model_builder = model_builder(**params)
-    model_builder.load_state_dict(torch.load(model_path, map_location=device))
-    return model_builder
     if params:
       model_builder = model_builder(**params)
     model_builder.load_state_dict(torch.load(model_path, map_location=device))

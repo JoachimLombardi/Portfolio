@@ -20,7 +20,6 @@ def predict_image(img_path, model, class_names, device, image_transform, h_size=
     model.eval()
     with torch.inference_mode():
         pred_logit = model(img_transformed.unsqueeze(0).to(device))
-        print(pred_logit.size())
     pred_probs = torch.softmax(pred_logit, dim=1)[0]
     pred_classes = pred_logit.argmax(1)
     fig = plt.figure(figsize=(l_size, h_size))
@@ -30,6 +29,22 @@ def predict_image(img_path, model, class_names, device, image_transform, h_size=
 
 
 def plot_predictions(device, test_dataloader, model, denorm=None, h_size=5, l_size=5, rows=3, cols=3, h_space=0.3, l_space=0.3, k=9):
+    '''
+    Plot a grid of images and their predictions.
+
+    Args:
+    device: A target device to compute on (e.g. "cuda" or "cpu").
+    test_dataloader: A DataLoader instance for the test dataset.
+    model: A trained PyTorch model.
+    denorm: A transform to denormalize the image.
+    h_size: The height of the figure.
+    l_size: The width of the figure.
+    rows: The number of rows in the grid.
+    cols: The number of columns in the grid.
+    h_space: The horizontal space between subplots.
+    l_space: The vertical space between subplots.
+    k: The number of images to plot.
+    '''
     fig = plt.figure(figsize=(l_size,h_size))
     class_names = test_dataloader.dataset.classes
     indices = random.sample(range(len(test_dataloader.dataset)), k=9)
