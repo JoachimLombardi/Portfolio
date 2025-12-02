@@ -14,7 +14,8 @@ def train_test_step(model: torch.nn.Module,
                     model_name: str = "model",
                     extra: str = None,
                     epochs: int = 5,
-                    is_writer: torch.utils.tensorboard.SummaryWriter = False
+                    is_writer: torch.utils.tensorboard.SummaryWriter = False,
+                    patience: int = 5
                     ) -> Dict[str, List[float]]:
     """
     Trains and tests a PyTorch model
@@ -33,6 +34,12 @@ def train_test_step(model: torch.nn.Module,
       loss_fn: A PyTorch loss function to minimize
       optimizer: A PyTorch optimizer to help minimize the loss function
       device: A target device to compute on (e.g. "cuda" or "cpu")
+      experiment_name: A unique name for the experiment
+      model_name: A unique name for the model
+      extra: A unique name for the experiment
+      epochs: An integer for number of epochs
+      is_writer: A boolean for whether to use tensorboard
+      patience: An integer for early stopping
 
     Returns:
       A dictionary of training and testing loss as well as training and
@@ -49,18 +56,21 @@ def train_test_step(model: torch.nn.Module,
     torch.cuda.manual_seed(42)
     if is_writer:
         writer = create_writer(experiment_name, model_name, extra)
+    best_acc = 0
     train_start = timer()
     for epoch in tqdm(range(epochs)):
         print(f"Epoch {epoch}\n-------")
         train_loss = 0
         train_acc = 0
+        max_train_prob = 0
         for batch, (X,y) in enumerate(train_dataloader):
             X, y = X.to(device), y.to(device)
             model.train().to(device)
             y_pred = model(X)
             loss = loss_fn(y_pred, y)
             train_loss += loss
-            train_acc += ((torch.eq(torch.argmax(dim=1, input=y_pred), y)).sum().item()/len(y_pred))*100
+            train_acc += ((torch.eq(torch.argmax(dim=1, input=y_pred), y)).float().mean()).item()*100
+            max_train_prob += torch.softmax(dim=1, input=y_pred).max(dim=1).values.mean().item()*100
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -68,23 +78,27 @@ def train_test_step(model: torch.nn.Module,
                 print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples")
         train_loss /= len(train_dataloader)
         train_acc /= len(train_dataloader)
+        max_train_prob /= len(train_dataloader)
         test_loss = 0
         test_acc = 0
+        max_test_prob = 0
         model.eval().to(device)
         with torch.inference_mode():
             for X, y in test_dataloader:
                 X, y = X.to(device), y.to(device)
                 test_pred = model(X)
                 test_loss += loss_fn(test_pred, y)
-                test_acc += ((torch.eq(torch.argmax(dim=1, input=test_pred), y)).sum().item()/len(test_pred))*100
+                test_acc += ((torch.eq(torch.argmax(dim=1, input=test_pred), y)).float().mean()).item()*100
+                max_test_prob += torch.softmax(dim=1, input=test_pred).max(dim=1).values.mean().item()*100
             test_loss /= len(test_dataloader)
             test_acc /= len(test_dataloader)
+            max_test_prob /= len(test_dataloader)
         results["train_loss"].append(train_loss.item())
         results["train_acc"].append(train_acc)
         results["test_loss"].append(test_loss.item())
         results["test_acc"].append(test_acc)
-        print(f"Train loss: {train_loss:.3f} | Train accuracy: {train_acc:.2f}%")
-        print(f"Test loss: {test_loss:.3f} | Test accuracy: {test_acc:.2f}%")
+        print(f"Train loss: {train_loss:.3f} | Train accuracy: {train_acc:.2f}% | Max train probability: {max_train_prob:.2f}%")
+        print(f"Test loss: {test_loss:.3f} | Test accuracy: {test_acc:.2f}% | Max test probability: {max_test_prob:.2f}%")
         if is_writer:
             # Add loss results to SummaryWriter
             writer.add_scalars(main_tag="Loss", 
@@ -100,6 +114,17 @@ def train_test_step(model: torch.nn.Module,
             writer.add_graph(model=model, 
                             # Pass in an example input
                             input_to_model=torch.randn(32, 3, 224, 224).to(device))
+        if test_acc > best_acc:
+            best_acc = test_acc
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+        if epochs_without_improvement == patience:
+            print(F"Early stopping: No improvement for {epochs_without_improvement} epochs")
+            break
+        if test_acc == 100:
+            print("Early stopping: 100%% accuracy reached")
+            break
     if is_writer:
         # Close the writer
         writer.close()
