@@ -14,7 +14,7 @@ def train_test_step(model: torch.nn.Module,
                     model_name: str = "model",
                     extra: str = None,
                     epochs: int = 5,
-                    is_writer: torch.utils.tensorboard.SummaryWriter = False,
+                    is_writer: bool = False,
                     patience: int = 5
                     ) -> Dict[str, List[float]]:
     """
