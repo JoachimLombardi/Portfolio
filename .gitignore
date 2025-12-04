@@ -18,3 +18,6 @@ __pycache__/
 # --- GENERATED IMAGES / PLOTS ---
 **/images/
 **/images/**
+
+# --- WEIGHTS ---
+*.pth
