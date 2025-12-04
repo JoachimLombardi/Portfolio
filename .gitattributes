@@ -1,2 +1,0 @@
-*.file_extension filter=lfs diff=lfs merge=lfs -text
-08_pretrained_vit_feature_extractor_pizza_steak_sushi.pth filter=lfs diff=lfs merge=lfs -text

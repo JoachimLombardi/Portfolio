@@ -20,7 +20,7 @@ vitb16, vitb16_transforms = create_vitb16_model(
 # Load saved weights
 vitb16.load_state_dict(
     torch.load(
-        f="08_pretrained_vit_feature_extractor_pizza_steak_sushi.pth",
+        f="08_pytorch_vit_b_16_swag.pth",
         map_location=torch.device("cpu"),  # load to CPU
     )
 )
@@ -28,7 +28,7 @@ vitb16.load_state_dict(
 ### 3. Predict function ###
 
 # Create predict function
-def predict(img) -> Tuple[Dict, float]:
+def predict(img) -> tuple[Dict, float]:
     """Transforms and performs a prediction on img and returns prediction and time taken.
     """
     # Start the timer
