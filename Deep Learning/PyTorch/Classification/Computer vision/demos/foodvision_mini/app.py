@@ -28,7 +28,7 @@ vitb16.load_state_dict(
 ### 3. Predict function ###
 
 # Create predict function
-def predict(img) -> tuple[Dict, float]:
+def predict(img) -> Tuple[Dict, float]:
     """Transforms and performs a prediction on img and returns prediction and time taken.
     """
     # Start the timer

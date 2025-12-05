@@ -1,13 +1,17 @@
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import os
+from going_modular.going_modular.utils import split_dataset
 
 def create_dataloaders(
         train_dir: str,
         test_dir: str,
         transform: transforms.Compose,
-        batch_size: int,
-        num_workers: int = os.cpu_count()
+        test_transform: transforms.Compose = None,
+        batch_size: int = 32,
+        num_workers: int = os.cpu_count(),
+        split_size: float | None = None,
+        seed: int = 42,
 ):
     '''
     Creates train and test dataloaders
@@ -28,10 +32,12 @@ def create_dataloaders(
         Either 'pizza', 'steak', 'sushi'
     '''
     train_data = datasets.ImageFolder(train_dir, transform=transform)
-    test_data = datasets.ImageFolder(test_dir, transform=transform)
-    print(f"Train data:\n{train_data}\nTest data:\n{test_data}")
+    test_data = datasets.ImageFolder(test_dir, transform=test_transform or transform) 
     # Get class names as a list
     class_names = train_data.classes
+    print(f"Train data:\n{train_data}\nTest data:\n{test_data}")
+    train_data, _ = split_dataset(train_data, split_size, seed) 
+    test_data, _ = split_dataset(test_data, split_size, seed) 
     # Turn train and test Datasets into DataLoaders
     train_dataloader = DataLoader(dataset=train_data, 
                                 batch_size=batch_size, # how many samples per batch?

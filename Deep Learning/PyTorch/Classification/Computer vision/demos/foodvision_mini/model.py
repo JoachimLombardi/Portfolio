@@ -1,9 +1,10 @@
 import torch
 import torchvision
 from torch import nn
+from typing import Tuple
 
 def create_vitb16_model(num_classes: int = 3,
-                        seed: int = 42) -> tuple[nn.Module, torchvision.transforms.Compose]:
+                        seed: int = 42) -> Tuple[nn.Module, torchvision.transforms.Compose]:
     """
     Create a ViT-B/16 feature extractor model and transforms
 
@@ -21,10 +22,14 @@ def create_vitb16_model(num_classes: int = 3,
     transforms = weights.transforms()
     # Get the model architecture with pretrained weights
     model = torchvision.models.vit_b_16(weights=weights)
+    # Freeze the feature extractor
+    for param in model.parameters():
+        param.requires_grad = False
     # Get the last layer input
     for module in reversed(list(model.modules())):
         if isinstance(module, nn.Linear):
-            in_features = module.in_features     
+            in_features = module.in_features
+            break     
     # Get its head
     torch.manual_seed(seed)
     model.heads = nn.Linear(in_features=in_features, out_features=num_classes)
