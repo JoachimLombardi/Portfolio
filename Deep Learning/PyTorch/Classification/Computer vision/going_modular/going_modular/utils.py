@@ -193,6 +193,53 @@ def freeze_pretrained_model(model, class_names, device):
         nn.Linear(in_features=in_features, out_features=len(class_names))
     ).to(device)
 
+from tqdm.auto import tqdm
+from PIL import Image
+from timeit import default_timer as timer 
+from typing import List, Dict
+
+
+def pred_and_store(paths: list,
+                   model: torch.nn.Module,
+                   class_names,
+                   transform: torchvision.transforms,
+                   device: str) -> List[Dict]:
+    '''
+    Makes predictions on a list of image paths and stores the results in a list of dictionaries.
+
+    Args:
+        paths: A list of image paths.
+        model: A PyTorch model.
+        class_names: A list of class names for the model.
+        transform: A PyTorch transform.
+        device: A target device to compute on (e.g. "cuda" or "cpu").
+
+    Returns:
+        A list of dictionaries containing the image path, class name, prediction probability, prediction class, prediction time
+        and whether the prediction was correct.
+    '''
+    pred_list = []
+    for path in tqdm(paths):
+        predict_dict = {}
+        predict_dict["image_path"] = path
+        class_name = path.parent.stem
+        predict_dict["class_names"] = class_name
+        start = timer()
+        img = Image.open(path)
+        img_transformed = transform(img).to(device)
+        model.eval()
+        with torch.inference_mode():
+            logit = model(img_transformed.unsqueeze(0)).to(device)
+        pred_prob = torch.softmax(logit, dim=1)
+        pred_class = torch.argmax(pred_prob, dim=1)
+        predict_dict["pred_prob"] = f"{round(pred_prob[0][pred_class].item()*100, 2)} %"
+        predict_dict["pred_class"] = class_names[pred_class.cpu()]
+        stop = timer()
+        predict_dict["time_for_pred"] = round(stop - start, 4)
+        predict_dict["correct"] = class_name == predict_dict["pred_class"]
+        pred_list.append(predict_dict)
+    return pred_list
+
 
 def split_dataset(dataset:torchvision.datasets, split_size:float=0.2, seed:int=42):
     """Randomly splits a given dataset into two proportions based on split_size and seed.
