@@ -130,5 +130,7 @@ def train_test_step(model: torch.nn.Module,
         writer.close()
     train_end = timer()
     total_time = train_end - train_start
-    print(f"Train time on {device}: {total_time:.3f} seconds")
+    minutes = total_time // 60
+    secondes = total_time % 60
+    print(f"Train time on {device}: {minutes} minutes {secondes:.1f} secondes")
     return results

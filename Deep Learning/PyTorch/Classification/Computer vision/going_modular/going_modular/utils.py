@@ -2,7 +2,7 @@
 Contains various utility functions for PyTorch model training and saving.
 """
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import matplotlib.pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
@@ -11,6 +11,7 @@ import torch
 from torch import nn
 import numpy as np
 import torchvision
+import torchvision.models as models
 
 
 def save_model(model: torch.nn.Module,
@@ -100,13 +101,24 @@ def plot_loss_curves(results: Dict[str, List[float]]):
     # Figure out how many epochs there were
     epochs = range(len(results['train_loss']))
 
+    # Get the min test loss and max test acc
+    min_test_loss_index = np.argmin(test_loss)
+    max_test_acc_index = np.argmax(test_accuracy)
+    min_test_loss = test_loss[min_test_loss_index]
+    max_test_acc = test_accuracy[max_test_acc_index]
+
+    loss_label = f"Best epochs: {min_test_loss_index} | Min test loss: {min_test_loss:.3f}"
+    accuracy_label = f"Best epochs: {max_test_acc_index} | Max test acc: {max_test_acc:.3f}"
+
     # Setup a plot 
     plt.figure(figsize=(15, 7))
+    plt.style.use('fivethirtyeight')
 
     # Plot loss
     plt.subplot(1, 2, 1)
     plt.plot(epochs, loss, label='train_loss')
     plt.plot(epochs, test_loss, label='test_loss')
+    plt.scatter(min_test_loss_index, min_test_loss, s=150, color='blue', label=loss_label)
     plt.title('Loss')
     plt.xlabel('Epochs')
     plt.legend()
@@ -115,9 +127,13 @@ def plot_loss_curves(results: Dict[str, List[float]]):
     plt.subplot(1, 2, 2)
     plt.plot(epochs, accuracy, label='train_accuracy')
     plt.plot(epochs, test_accuracy, label='test_accuracy')
+    plt.scatter(max_test_acc_index, max_test_acc, s=150, color='blue', label=accuracy_label)
     plt.title('Accuracy')
     plt.xlabel('Epochs')
     plt.legend()
+
+    plt.tight_layout()
+    plt.show()
 
 
 def create_writer(experiment_name: str, 
@@ -272,3 +288,48 @@ def split_dataset(dataset:torchvision.datasets, split_size:float=0.2, seed:int=4
                                                                    lengths=[length_1, length_2],
                                                                    generator=torch.manual_seed(seed)) # set the random seed for reproducible splits
     return random_split_1, random_split_2
+
+
+def create_torchvision_model(num_classes: int = 3,
+                             seed: int = 42,
+                             model_name: str = "ViT_B_16",
+                             weights_name: str = "IMAGENET1K_SWAG_E2E_V1") -> Tuple[nn.Module, torchvision.transforms.Compose]:
+    """
+    Create a torchvision feature extractor model and transforms
+
+    Args:
+        num_classes (int, optional): number of classes. Defaults to 3.
+        seed (int, optional): random seed. Defaults to 42.
+        model_name (str, optional): name of the model. Defaults to vit_b_16.
+        weights_name (str, optional): name of the weights corresponding to the model. Defaults to IMAGENET1K_SWAG_E2E_V1.
+
+    Returns:
+        model (nn.Module): torchvision feature extractor model, 
+        transforms (torchvision.transforms.Compose): torchvision images transforms
+    """
+    # Get the model weights
+    weights_class_name = model_name + "_Weights"
+    weights_class = getattr(models, weights_class_name)
+    weights = getattr(weights_class, weights_name)
+    # Get automatic transforms from pretrained ViT weights
+    transforms = weights.transforms()
+    # Get the model architecture with pretrained weights
+    model = getattr(models, model_name.lower())(weights=weights)
+    # Freeze the feature extractor
+    for param in model.parameters():
+        param.requires_grad = False 
+    # Get its head
+    torch.manual_seed(seed)
+    for name, module in model.named_modules():
+        if isinstance(module, nn.Linear):
+            last_name = name   # we keep the last nn.linear
+    # last_name is a path, ex : "heads.head"
+    # Get the parent module
+    parts = last_name.split(".")
+    parent = model
+    for p in parts[:-1]:
+        parent = getattr(parent, p)
+    # Replace final layer
+    old = getattr(parent, parts[-1])
+    setattr(parent, parts[-1], nn.Linear(old.in_features, num_classes))
+    return model, transforms
