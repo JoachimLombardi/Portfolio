@@ -12,6 +12,13 @@ from torch import nn
 import numpy as np
 import torchvision
 import torchvision.models as models
+import random
+from tqdm.auto import tqdm
+from PIL import Image
+from timeit import default_timer as timer 
+from timm.data import create_transform
+import timm
+
 
 
 def save_model(model: torch.nn.Module,
@@ -209,11 +216,6 @@ def freeze_pretrained_model(model, class_names, device):
         nn.Linear(in_features=in_features, out_features=len(class_names))
     ).to(device)
 
-from tqdm.auto import tqdm
-from PIL import Image
-from timeit import default_timer as timer 
-from typing import List, Dict
-
 
 def pred_and_store(paths: list,
                    model: torch.nn.Module,
@@ -243,6 +245,7 @@ def pred_and_store(paths: list,
         start = timer()
         img = Image.open(path)
         img_transformed = transform(img).to(device)
+        model.to(device)
         model.eval()
         with torch.inference_mode():
             logit = model(img_transformed.unsqueeze(0)).to(device)
@@ -255,6 +258,22 @@ def pred_and_store(paths: list,
         predict_dict["correct"] = class_name == predict_dict["pred_class"]
         pred_list.append(predict_dict)
     return pred_list
+
+
+def random_paths(dataset_dir: str,
+                 k: int = 3):
+    """
+    Randomly select path of image from the dataset directy.
+
+    Args: 
+        path (string): path to the dataset directory.
+        k (int, optional): number of random image path to return.
+
+    Returns:
+        List of images path.
+    """
+    plant_img_path = list(Path(dataset_dir).glob("*/*.jpg"))
+    return [Path(filepath) for filepath in random.sample(plant_img_path, k=3)]
 
 
 def split_dataset(dataset:torchvision.datasets, split_size:float=0.2, seed:int=42):
@@ -332,4 +351,35 @@ def create_torchvision_model(num_classes: int = 3,
     # Replace final layer
     old = getattr(parent, parts[-1])
     setattr(parent, parts[-1], nn.Linear(old.in_features, num_classes))
+    return model, transforms
+
+
+def create_timm_model(model_name: str,
+                      class_names: list,
+                      IMAGE_SIZE: int = 224,
+                      weights_std: str = "IMAGENET_DEFAULT_STD",
+                      weights_mean: str = "IMAGENET_DEFAULT_MEAN") -> Tuple[timm.create_model, timm.data.create_transform]:
+    """
+    Create a timm feature extractor model and transforms
+
+    Args:
+        model_name (str): name of the model.
+        class_names (list): list of class names.
+        weights_std (str, optional): name of the weights standard deviation corresponding to the model. Defaults to IMAGENET_DEFAULT_STD.
+        weights_mean (str, optional): name of the weights mean corresponding to the model. Defaults to IMAGENET_DEFAULT_MEAN.
+
+    Returns:
+        model (nn.Module): timm feature extractor model, 
+        transforms (torchvision.transforms.Compose): timm images transforms
+    """
+    model = timm.create_model(model_name, 
+                              pretrained = True, 
+                              num_classes = len(class_names))
+    # Create the transform
+    transforms = create_transform(input_size=(3, IMAGE_SIZE, IMAGE_SIZE),
+                                  mean=model.default_cfg.get("mean", getattr(timm.data.constants, weights_mean)),
+                                  std=model.default_cfg.get("std", getattr(timm.data.constants, weights_std)),
+                                  crop_pct=model.default_cfg.get("crop_pct", 1.0),
+                                  interpolation=model.default_cfg.get("interpolation", "bilinear")
+                                 )
     return model, transforms

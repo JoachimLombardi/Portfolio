@@ -67,13 +67,13 @@ def create_dataloaders(
     total = sum(counts.values())
     ratios = {cls: count/total for cls, count in counts.items()}
     sampler = None
-    if max(ratios.values()) - min(ratios.values()) > 0.1:  # dataset déséquilibré
+    if max(ratios.values()) - min(ratios.values()) > 0.1:  # check if classes are balanced
         print("Classes are not balanced, creating weights for each sample...")
         class_weights = {cls: 1/count for cls, count in counts.items()}
         sample_weights = [class_weights[label] for label in labels]
         sampler = WeightedRandomSampler(
             weights=torch.DoubleTensor(sample_weights),
-            num_samples=len(sample_weights),  # taille du subset train
+            num_samples=len(sample_weights),  # size of train subset
             replacement=True
         )
     # Turn train and test Datasets into DataLoaders

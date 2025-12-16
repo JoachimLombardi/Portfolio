@@ -27,6 +27,15 @@ Grape___black_measles
 Grape___black_rot
 Grape___healthy
 Grape___leaf_blight
+Lemon___Anthracnose
+Lemon___Bacterial Blight
+Lemon___Citrus Canker
+Lemon___Curl Virus
+Lemon___Deficiency Leaf
+Lemon___Dry Leaf
+Lemon___Healthy Leaf
+Lemon___Sooty Mould
+Lemon___Spider Mites
 Orange___citrus_greening
 Peach___bacterial_spot
 Peach___healthy

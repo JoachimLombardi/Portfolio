@@ -59,6 +59,7 @@ def train_test_step(model: torch.nn.Module,
     best_acc = 0
     train_start = timer()
     for epoch in tqdm(range(epochs)):
+        train_epoch_start = timer()
         print(f"Epoch {epoch}\n-------")
         train_loss = 0
         train_acc = 0
@@ -79,6 +80,9 @@ def train_test_step(model: torch.nn.Module,
         train_loss /= len(train_dataloader)
         train_acc /= len(train_dataloader)
         max_train_prob /= len(train_dataloader)
+        train_epoch_end = timer()
+        train_epoch_time = train_epoch_end - train_epoch_start
+        test_epoch_start = timer()
         test_loss = 0
         test_acc = 0
         max_test_prob = 0
@@ -93,12 +97,17 @@ def train_test_step(model: torch.nn.Module,
             test_loss /= len(test_dataloader)
             test_acc /= len(test_dataloader)
             max_test_prob /= len(test_dataloader)
+        test_epoch_end = timer()
+        test_epoch_time = test_epoch_end - test_epoch_start
         results["train_loss"].append(train_loss.item())
         results["train_acc"].append(train_acc)
         results["test_loss"].append(test_loss.item())
         results["test_acc"].append(test_acc)
+        results["train_epoch_time"].append(train_epoch_time)
+        results["test_epoch_time"].append(test_epoch_time)
         print(f"Train loss: {train_loss:.3f} | Train accuracy: {train_acc:.2f}% | Max train probability: {max_train_prob:.2f}%")
         print(f"Test loss: {test_loss:.3f} | Test accuracy: {test_acc:.2f}% | Max test probability: {max_test_prob:.2f}%")
+        print(f"Train epoch time: {train_epoch_time:.2f}s | Test epoch time: {test_epoch_time:.2f}s")
         if is_writer:
             # Add loss results to SummaryWriter
             writer.add_scalars(main_tag="Loss", 
